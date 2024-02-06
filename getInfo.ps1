@@ -194,5 +194,3 @@ $filecheck | Out-File $folder\"filecheck.txt"
 $Body = (Get-Content $folder\"sysoutput.txt" -Raw) + (Get-Content $folder\"network.txt" -Raw) + (Get-Content $folder\"monitor.txt" -Raw) + (Get-Content $folder\"filecheck.txt" -Raw)
 $mail = "mail." + $compsys.Domain
 Write-Host $Body
-Send-MailMessage -SmtpServer $mail -To "hdesai@evertz.com" -From "Reports@5288.IT" -Body $Body -Subject $compsys.DnsHostname
-Remove-Item -Path $env:UserProfile\Desktop\tracker -Recurse

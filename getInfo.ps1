@@ -1,8 +1,6 @@
 #----------
 #OUTPUT PATH
 #-----
-If (Test-Path $env:UserProfile\Desktop\tracker) {Remove-Item -Path C:\Windows\Temp\tracker -Recurse}
-New-Item -Path $env:UserProfile\Desktop -Name tracker -ItemType directory  | Out-Null
 $folder = "$env:UserProfile\Desktop\tracker"
 #-----
 #----------

@@ -192,5 +192,4 @@ $filecheck | Out-File $folder\"filecheck.txt"
 #EMAIL OUTPUT
 #-----
 $Body = (Get-Content $folder\"sysoutput.txt" -Raw) + (Get-Content $folder\"network.txt" -Raw) + (Get-Content $folder\"monitor.txt" -Raw) + (Get-Content $folder\"filecheck.txt" -Raw)
-$mail = "mail." + $compsys.Domain
 Write-Host $Body

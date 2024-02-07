@@ -7,7 +7,7 @@ $folder = "$env:UserProfile\Desktop\tracker"
 #-----
 #----------
 
-#----------
+<# #----------
 #SYSTEM INFORMATION
 #-----
 $compsys = Get-WmiObject win32_computersystem
@@ -146,7 +146,7 @@ $network =
 "`n`n"
 $network | Out-File $folder\"network.txt"
 #-----
-#----------
+#---------- #>
 
 #----------
 #MONITOR INFORMATION

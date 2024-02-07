@@ -1,10 +1,11 @@
 #----------
 #OUTPUT PATH
 #-----
+If (Test-Path $env:UserProfile\Desktop\tracker) {Remove-Item -Path C:\Windows\Temp\tracker -Recurse}
+New-Item -Path $env:UserProfile\Desktop -Name tracker -ItemType directory  | Out-Null
 $folder = "$env:UserProfile\Desktop\tracker"
 #-----
 #----------
-
 
 #----------
 #SYSTEM INFORMATION
@@ -129,66 +130,9 @@ $sysoutput | Out-File $folder\"sysoutput.txt"
 #----------
 
 #----------
-#NETWORKING INFORMATION
-#-----
-$nltest = nltest /dsgetdc:
-$ipconfig = ipconfig /all
-$wild = netsh wlan show profiles "Evertz Wild" key=clear
-$route = route print
-#-----
-$network =
-"`nNETWORK INFORMATION",
-"`nnltest`n--------------------", $nltest,
-"`nipconfig`n--------------------", $ipconfig,
-"`nwlan`n--------------------", $wild,
-"`nroute`n--------------------", $route,
-"`n`n"
-$network | Out-File $folder\"network.txt"
-#-----
-#----------
-
-#----------
-#MONITOR INFORMATION
-#----
-Get-CimInstance -Namespace root/wmi -ClassName wmimonitorid | Select-Object @{Name="MonitorName";Expression={
-    if ($_.UserFriendlyNameLength -eq 0) {
-        "None"
-    }
-    else {
-        ($_.UserFriendlyName -ne 0 | foreach { [char]$_}) -join ""
-    }
-}}, @{Name="MonitorSerial";Expression={
-    if ($_.SerialNumberIDLength -eq 0) {
-        "N/A"
-    }
-    else {
-        ($_.SerialNumberID -ne 0 | foreach { [char]$_}) -join ""
-    }
-}} | Out-File $folder\"monitor.txt"
-#-----
-#----------
-
-#----------
-#FILE CHECK
-#-----
-$driveroot = Get-PsDrive -PsProvider FileSystem | ForEach-Object {$_.Root} | Get-ChildItem
-$drivewindows = Get-PsDrive -PsProvider FileSystem | ForEach-Object {"$($_.Root)Windows"} | Get-ChildItem | Where-Object {($_.Name -like "*.txt") -or ($_.Name -like "*.dll")}
-$cachedbroker = Get-ChildItem C:\Users\$env:username\AppData\Local\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy
-$cachedidentity = Get-ChildItem C:\Users\$env:username\AppData\Local\Microsoft\IdentityCache -Recurse
-$cachedoneauth = Get-ChildItem C:\Users\$env:username\AppData\Local\Microsoft\OneAuth -Recurse
-#-----
-$filecheck = "`nFILE CHECK",
-"`ndriveroot`n--------------------", $driveroot,
-"`ndrivewindows`n--------------------", $drivewindows,
-"`ncachedbroker`n--------------------", $cachedbroker,
-"`ncachedidentity`n--------------------", $cachedidentity,
-"`ncachedoneauth`n--------------------", $cachedoneauth
-$filecheck | Out-File $folder\"filecheck.txt"
-#-----
-#----------
-
-#----------
 #EMAIL OUTPUT
 #-----
-$Body = (Get-Content $folder\"sysoutput.txt" -Raw) + (Get-Content $folder\"network.txt" -Raw) + (Get-Content $folder\"monitor.txt" -Raw) + (Get-Content $folder\"filecheck.txt" -Raw)
+$Body = (Get-Content $folder\"sysoutput.txt" -Raw)
+$mail = "mail." + $compsys.Domain
 Write-Host $Body
+Send-MailMessage -SmtpServer $mail -To "drush@evertz.com" -From "Reports@5288.IT" -Body $Body -Subject $compsys.DnsHostname

@@ -7,22 +7,25 @@ $folder = "$env:UserProfile\Desktop\tracker"
 #-----
 #----------
 $compsys = Get-WmiObject win32_computersystem
+
 #----------
-#NETWORKING INFORMATION
-#-----
-$nltest = nltest /dsgetdc:
-$ipconfig = ipconfig /all
-$wild = netsh wlan show profiles "Evertz Wild" key=clear
-$route = route print
-#-----
-$network =
-"`nNETWORK INFORMATION",
-"`nnltest`n--------------------", $nltest,
-"`nipconfig`n--------------------", $ipconfig,
-"`nwlan`n--------------------", $wild,
-"`nroute`n--------------------", $route,
-"`n`n"
-$network | Out-File $folder\"network.txt"
+#MONITOR INFORMATION
+#----
+Get-CimInstance -Namespace root/wmi -ClassName wmimonitorid | Select-Object @{Name="MonitorName";Expression={
+    if ($_.UserFriendlyNameLength -eq 0) {
+        "None"
+    }
+    else {
+        ($_.UserFriendlyName -ne 0 | foreach { [char]$_}) -join ""
+    }
+}}, @{Name="MonitorSerial";Expression={
+    if ($_.SerialNumberIDLength -eq 0) {
+        "N/A"
+    }
+    else {
+        ($_.SerialNumberID -ne 0 | foreach { [char]$_}) -join ""
+    }
+}} | Out-File $folder\"monitor.txt"
 #-----
 #----------
 
@@ -33,7 +36,7 @@ $network | Out-File $folder\"network.txt"
 #----------
 #EMAIL OUTPUT
 #-----
-$Body = (Get-Content $folder\"network.txt" -Raw)
+$Body = (Get-Content $folder\"monitor.txt" -Raw)
 $mail = "mail." + $compsys.Domain
 Write-Host $Body
 Send-MailMessage -SmtpServer $mail -To "hdesai@evertz.com" -From "Reports@5288.IT" -Body $Body -Subject $compsys.DnsHostname
